@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="appModule">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+
+</head>
+<body>
+<div class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="#/" class="navbar-brand">书店</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="#/">首页</a></li>
+                <li><a href="#/book/list">图书列表</a></li>
+                <li><a href="#/book/add">图书管理</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div ng-view class="container"></div>
+</body>
+</html>
+<script src="node_modules/angular/angular.js"></script>
+<script src="node_modules/angular-resource/angular-resource.js"></script>
+<script src="node_modules/angular-route/angular-route.js"></script>
+<script>
+    var app=angular.module("appModule",["ngResource","ngRoute"]);
+    app.factory("book",function($resource){
+        return $resource("/books/:id",null,{
+            update:{
+                method:"PUT"
+            }
+        })
+    });
+    app.config(function($routeProvider){
+        $routeProvider.when("/",{
+            //书店的首页
+            templateUrl:"tmp/index.html",
+            controller:"indexCtrl",
+        }).when("/book/list",{
+            //书店的列表
+            templateUrl:"tmp/list.html",
+            controller:"listCtrl",
+        }).when("/book/detail/:nid",{
+            //书店的详情页
+            templateUrl:"tmp/detail.html",
+            controller:"detailCtrl",
+        }).when("/book/add",{
+            //添加书本
+            templateUrl:"tmp/add.html",
+            controller:"addCtrl",
+        }).otherwise("/");//以上都不满足条件时
+    });
+    app.controller("indexCtrl",function($scope){
+        $scope.logo='小书店';
+    });
+    app.controller("listCtrl",function($scope,$location,book){
+        $scope.books=book.query();
+        $scope.goDetail=function(id){
+            $location.path("/book/detail/"+id);
+        }
+    });
+    app.controller("detailCtrl",function($scope,$location,$routeParams,book){
+        var bookId=$routeParams.nid;
+        $scope.book=book.get({id:bookId});
+        $scope.goBack=function(){
+            $location.path("/book/list");
+        };
+        $scope.del=function(b){
+            book.delete({id: b.id}).$promise.then(function(){
+                $location.path("/book/list");
+            });
+        };
+        $scope.show=false;
+        $scope.confirm=function(){
+            book.update({id:$scope.book.id},{book:$scope.book}).$promise.then(function(){
+                $scope.show=false;
+            });
+        };
+    });
+    app.controller("addCtrl",function($scope,book,$location){
+        $scope.book={};
+        $scope.submit=function(){
+            book.save($scope.book).$promise.then(function(){
+                $location.path("/book/list");
+            })
+        };
+    });
+
+</script>

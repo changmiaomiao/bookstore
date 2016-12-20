@@ -1,0 +1,24 @@
+<!--书本详情-->
+<style>
+    img{
+        width: 230px;
+        height: 256px;
+    }
+</style>
+<div class="panel panel-warning">
+    <div class="panel-heading text-center">
+        名称: <span ng-hide="show">{{book.name}}</span>
+        <input type="text" ng-model="book.name" ng-show="show">
+        <button type="button" class="btn pull-right btn-xs" ng-click="goBack()">返回</button>
+    </div>
+    <div class="panel-body text-center">
+        <img ng-src="{{book.cover}}" alt="">
+    </div>
+    <div class="panel-footer text-center">
+        价格: <span ng-hide="show">{{book.price|currency:"$"}}</span>
+        <input type="text" ng-model="book.price" ng-show="show">
+        <button class="btn btn-warning" ng-click="show=true">修改</button>
+        <button type="button" class="btn btn-danger" ng-click="del(book)" ng-hide="show">删除</button>
+        <button type="button" ng-click="confirm()" ng-show="show" class="btn btn-success">确定提交</button>
+    </div>
+</div>
